@@ -1,0 +1,2 @@
+# VAD
+VAD Challenge  - Sonos

@@ -4,13 +4,16 @@ xp_config:
 
 data:
   data_dir: /home/virgile/data/vad_data_augmented
+  valid_percent: 0.85
   batch_size: 128
-  n_mels: 256
   n_frames: 256
+  nfft: 1048
+  hop_length: 512
+  n_mels: 256
+  sr: 16000
+  norm: False
   n_workers: 4
   pin_memory: False
-  seq_len: 128
-
 
 model:
   n_feat: 256

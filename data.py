@@ -1,14 +1,10 @@
 from glob import glob
-import scipy as sp
 import torch as th
 import pandas as pd
 import torchaudio
 import pytorch_lightning as pl
 from typing import Optional
-import numpy as np
-import random
 import os
-import json
 
 
 def get_frame_targets(audio_path, total_frames, hop_length, sr=16000):
@@ -59,21 +55,23 @@ class MelVADDataset(th.utils.data.Dataset):
         targets = targets[:, offset:offset+self.n_frames]
         #print(offset, offset+self.n_frames)
 
-
         if self.norm:
+            pass
             # TODO
-            streams = (streams - mean) / std
-            return {"spectro": sample, "targets": targets, "mean": mean, "std": std}
+        #    streams = (streams - mean) / std
+        #    return {"spectro": sample, "targets": targets, "mean": mean, "std": std}
         else:
             return {"spectro": sample, "targets": targets}
 
 
 class VADMelDataModule(pl.LightningDataModule):
-    def __init__(self, data_dir, batch_size, n_frames=256, nfft=400, hop_length=160, n_mels=64, sr=16000, norm=False,
+    def __init__(self, data_dir, batch_size, valid_percent=0.85, n_frames=256, nfft=400, hop_length=160, n_mels=64, sr=16000, norm=False,
                  n_workers=4, pin_memory=False, **kwargs):
         super().__init__()
 
-        self.data_dir = data_dir
+        # Get train/val split
+        self.path_list = glob(os.path.join(data_dir, '*.wav'))
+        self.split = round(valid_percent*len(self.path_list))
         self.batch_size = batch_size
         self.n_frames = n_frames
         self.nfft = nfft
@@ -85,19 +83,15 @@ class VADMelDataModule(pl.LightningDataModule):
         self.pin_memory = pin_memory
 
     def setup(self, stage: Optional[str] = None):
-        # Get train/val split
-        path_list = glob(os.path.join(self.data_dir, '*.wav'))
-        split = round(0.85*len(path_list))
-
         # Instantiate sub datasets
-        self.train_set = MelVADDataset(path_list[:split], 
+        self.train_set = MelVADDataset(self.path_list[:self.split], 
                                        n_frames=self.n_frames, 
                                        nfft=self.nfft, 
                                        hop_length=self.hop_length, 
                                        n_mels=self.n_mel, 
                                        sr=self.sr,
                                        norm=self.norm)
-        self.val_set = MelVADDataset(path_list[split:], 
+        self.val_set = MelVADDataset(self.path_list[self.split:], 
                                        n_frames=self.n_frames, 
                                        nfft=self.nfft, 
                                        hop_length=self.hop_length, 
@@ -118,21 +112,3 @@ class VADMelDataModule(pl.LightningDataModule):
                                         pin_memory=False,
                                         shuffle=False,
                                         num_workers=self.n_workers)
-
-
-
-
-if __name__ == "__main__":
-
-    data_dir = "/data/upms-guitar"
-    seed = 243
-    subset = "gtr+acc-smc-clean-44100"
-    mode = "train"
-    n_samples = 130048
-
-    # dataset = UPMSWAVDataset(data_dir, seed, subset, mode, n_samples)
-    dataset = MonoUPMSWAVDataset(
-        data_dir, seed, subset, mode, n_samples, "guitar", ["acc"]
-    )
-    print(len(dataset))
-    print(dataset[0])

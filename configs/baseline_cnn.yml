@@ -1,0 +1,44 @@
+xp_config:
+  model_type: VAD
+  dataset: sonos-vad
+
+data:
+  data_dir: /home/virgile/data/vad_data_augmented
+  batch_size: 128
+  n_mels: 256
+  n_frames: 256
+  n_workers: 4
+  pin_memory: False
+  seq_len: 128
+
+
+model:
+  n_feat: 256
+  cnn_channels: 32
+  embed_dim: 256
+  dff: 512
+  num_heads: 16
+
+training:
+  optim: 'SGD'
+  lr: 0.0003
+  weight_decay: 0.00001
+
+trainer:
+  fast_dev_run: False
+  gpus: "1" 
+  precision: 32
+  accumulate_grad_batches: 1
+  profiler: False
+  val_check_interval: 1.0
+  log_every_n_steps: 500
+  max_steps: 50000
+  auto_lr_find: False
+
+model_checkpoint:
+  monitor: val_loss
+  dirpath: checkpoints/
+  filename: '{epoch:02d}'
+  save_last: true
+
+

@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+import librosa
 
 
 def add_wgn(s,var=1e-4):
@@ -18,10 +18,11 @@ def read_wav(filename):
         read wav file.
         Normalizes signal to values between -1 and 1.
         Also add some jitter to remove all-zero segments."""
-    fs, s = wavfile.read(filename) # scipy reads int
-    s = np.array(s)/float(max(abs(s)))
-    s = add_wgn(s) # Add jitter for numerical stability
-    return fs,s
+    #x, sr = wavfile.read(filename) # scipy reads int
+    x, sr = librosa.load(filename, sr=16000)
+    x = np.array(x)/float(max(abs(x)))
+    x = add_wgn(x) # Add jitter for numerical stability
+    return sr,x
 
 #===============================================================================
 def enframe(x, win_len, hop_len):

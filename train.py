@@ -17,7 +17,7 @@ def main(hparams_file):
 
     checkpoint_callback = ModelCheckpoint(**cfg['model_checkpoint'])
     
-    datamodule = VADMelDataModule(cfg['data'])
+    datamodule = VADMelDataModule(**cfg['data'])
 
     trainer = pl.Trainer(**cfg['trainer'],
                         logger=logger,

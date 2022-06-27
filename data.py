@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 from typing import Optional
 import os
 
+EPS = 1e-8
 
 def get_frame_targets(audio_path, total_frames, hop_length, sr=16000):
 
@@ -14,7 +15,7 @@ def get_frame_targets(audio_path, total_frames, hop_length, sr=16000):
 
     cur_frame = 0
     for i in df.index:
-        utt_len = int(df.iloc[i].utt_time / (hop_length/sr)) # 10ms hop length
+        utt_len = int(round(df.iloc[i].utt_time / (hop_length/sr)))
 
         gt[cur_frame:cur_frame+utt_len] = df.iloc[i].speech 
         cur_frame += utt_len
@@ -23,7 +24,7 @@ def get_frame_targets(audio_path, total_frames, hop_length, sr=16000):
 
 
 class MelVADDataset(th.utils.data.Dataset):
-    def __init__(self, path_list, n_frames=256, nfft=400, hop_length=160, n_mels=64, sr=16000, norm=False):
+    def __init__(self, path_list, n_frames, nfft, hop_length, n_mels, sr, norm=False):
         self.path_list = path_list
         self.sr = sr
         self.mel_spec =  torchaudio.transforms.MelSpectrogram(n_fft=nfft, hop_length=hop_length, n_mels=n_mels)
@@ -41,19 +42,16 @@ class MelVADDataset(th.utils.data.Dataset):
         # Load track
         track_path = self.path_list[idx]
         audio, _ = torchaudio.load(track_path)
-        # MelSpec
-        spec = th.log(self.mel_spec(audio))
+        # LogMelSpec
+        spec = th.log(self.mel_spec(audio)+EPS)
         
         # Get spec sample
         offset = int(th.randint(0, spec.shape[-1] - self.n_frames, [1]))
-        print(offset, type(offset))
         sample = spec[:, :, offset:offset+self.n_frames]
-        #print(offset, offset+self.n_frames)
 
         # Get targets
         targets = get_frame_targets(track_path, total_frames=spec.shape[-1], hop_length=self.hop_length)
         targets = targets[:, offset:offset+self.n_frames]
-        #print(offset, offset+self.n_frames)
 
         if self.norm:
             pass
@@ -65,12 +63,12 @@ class MelVADDataset(th.utils.data.Dataset):
 
 
 class VADMelDataModule(pl.LightningDataModule):
-    def __init__(self, data_dir, batch_size, valid_percent=0.85, n_frames=256, nfft=400, hop_length=160, n_mels=64, sr=16000, norm=False,
+    def __init__(self, data_dir, batch_size=128, valid_percent=0.85, n_frames=256, nfft=400, hop_length=160, n_mels=64, sr=16000, norm=False,
                  n_workers=4, pin_memory=False, **kwargs):
         super().__init__()
 
         # Get train/val split
-        self.path_list = glob(os.path.join(data_dir, '*.wav'))
+        self.path_list = glob(os.path.join(str(data_dir), '*.wav'))
         self.split = round(valid_percent*len(self.path_list))
         self.batch_size = batch_size
         self.n_frames = n_frames
@@ -88,14 +86,14 @@ class VADMelDataModule(pl.LightningDataModule):
                                        n_frames=self.n_frames, 
                                        nfft=self.nfft, 
                                        hop_length=self.hop_length, 
-                                       n_mels=self.n_mel, 
+                                       n_mels=self.n_mels, 
                                        sr=self.sr,
                                        norm=self.norm)
         self.val_set = MelVADDataset(self.path_list[self.split:], 
                                        n_frames=self.n_frames, 
                                        nfft=self.nfft, 
                                        hop_length=self.hop_length, 
-                                       n_mels=self.n_mel, 
+                                       n_mels=self.n_mels, 
                                        sr=self.sr,
                                        norm=self.norm)
 

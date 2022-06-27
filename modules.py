@@ -37,8 +37,8 @@ class VADNet(nn.Module):
     def __init__(self, n_feat=256, cnn_channels=32, embed_dim=256, dff=512, num_heads=16):
         super().__init__()
         self.cnn_embedder = CNNEmbedder(ch_in=1, ch_out=cnn_channels) 
-        # after the framewise flattening operation we have F'xC = 16*32 = 512 channels
-        self.fc1 = nn.Linear(in_features=512, out_features=embed_dim)
+        # after the framewise flattening operation we have F'xC = (n_feat/16)*cnn_channels
+        self.fc1 = nn.Linear(in_features=int((n_feat/16)*cnn_channels), out_features=embed_dim)
         self.self_attention = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads)
         self.layer_norm1 = nn.LayerNorm(embed_dim)
         self.layer_norm2 = nn.LayerNorm(embed_dim)

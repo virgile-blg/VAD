@@ -40,7 +40,6 @@ trainer:
 
 model_checkpoint:
   monitor: val_loss
-  dirpath: checkpoints/
   filename: '{epoch:02d}'
   save_last: true
 

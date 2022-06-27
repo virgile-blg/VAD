@@ -23,7 +23,7 @@ model:
   num_heads: 16
 
 training:
-  optim: 'SGD'
+  optim: 'Adam'
   lr: 0.0003
   weight_decay: 0.00001
 
@@ -34,14 +34,10 @@ trainer:
   accumulate_grad_batches: 1
   profiler: False
   val_check_interval: 1.0
-  log_every_n_steps: 500
-  max_steps: 50000
+  max_epochs: 100
   auto_lr_find: False
 
 model_checkpoint:
   monitor: val_loss
-  dirpath: checkpoints/
-  filename: '{epoch:02d}'
+  filename: 'VAD-{epoch:02d}'
   save_last: true
-
-

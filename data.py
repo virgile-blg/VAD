@@ -30,10 +30,8 @@ class MelVADDataset(th.utils.data.Dataset):
         self.mel_spec =  torchaudio.transforms.MelSpectrogram(n_fft=nfft, hop_length=hop_length, n_mels=n_mels)
         self.hop_length = hop_length
         self.n_frames = n_frames
-        self.norm = norm
         # TODO
-        #with open(os.path.join(data_dir, "stats.json"), "r") as f:
-        #    self.stats = json.load(f)
+        self.norm = norm
 
     def __len__(self):
         return len(self.path_list)
@@ -54,10 +52,8 @@ class MelVADDataset(th.utils.data.Dataset):
         targets = targets[:, offset:offset+self.n_frames]
 
         if self.norm:
+             # TODO
             pass
-            # TODO
-        #    streams = (streams - mean) / std
-        #    return {"spectro": sample, "targets": targets, "mean": mean, "std": std}
         else:
             return {"spectro": sample, "targets": targets}
 

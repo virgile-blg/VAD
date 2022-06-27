@@ -10,7 +10,6 @@ from model import *
 class VADPredictor(object):
     def __init__(self, ckpt_folder, device) -> None:
         super().__init__()
-
         self.ckpt_folder = ckpt_folder
         self.cfg = yaml.load(open(os.path.join(ckpt_folder, 'hparams.yml')), Loader=yaml.FullLoader)
         self.model = self.load_model()
@@ -67,5 +66,5 @@ if __name__ == "__main__":
         probs = predictor.predict(audio_path=args.input_file)
     else: 
         probs = predictor.plot_results(audio_path=args.input_file)
-        
+
     print(probs)

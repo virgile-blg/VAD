@@ -57,7 +57,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file', type=str, help='path to file to predict VAD')
     parser.add_argument('-p', '--plot_results', action='store_true', default=False, help='Plot spectrogram and model predictions')
-    parser.add_argument('-c', '--ckpt_folder', default='./checkpoints/128_mels', help='Plot spectrogram and model predictions')
+    parser.add_argument('-c', '--ckpt_folder', default='./checkpoints/128_mels', help='Path to model checkpoint')
     args = parser.parse_args()
     
     predictor = VADPredictor(ckpt_folder=args.ckpt_folder, device='cpu')

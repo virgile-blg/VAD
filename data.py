@@ -8,23 +8,35 @@ import os
 
 EPS = 1e-8
 
-def get_frame_targets(audio_path, total_frames, hop_length, sr=16000):
+def get_frame_targets(audio_path:str, total_frames:int, hop_length:int, sr:int=16000)->th.Tensor:
+    """Aligns groundtruth annotation in seconds to the spectrogram time axis.
+       Returns a binary Tensor array of the size of the spectrogram length.
 
+    Args:
+        audio_path (str): path to the audio file
+        total_frames (int): total frame of the spectrogram
+        hop_length (int): hop length parameter for the spectrogram
+        sr (int, optional): sample rate. Defaults to 16000.
+
+    Returns:
+        th.Tensor: binary Tensor array for groundtruth
+    """
     df = pd.read_csv(audio_path.replace('.wav', '.csv'))
     gt = th.zeros(total_frames)
 
     cur_frame = 0
     for i in df.index:
-        utt_len = int(round(df.iloc[i].utt_time / (hop_length/sr)))
+        utt_len = int(round(df.iloc[i].utt_time / (hop_length / sr)))
 
-        gt[cur_frame:cur_frame+utt_len] = df.iloc[i].speech 
+        gt[cur_frame:cur_frame + utt_len] = df.iloc[i].speech 
         cur_frame += utt_len
 
     return gt.unsqueeze(0)
 
 
 class MelVADDataset(th.utils.data.Dataset):
-    def __init__(self, path_list, n_frames, nfft, hop_length, n_mels, sr, norm=False):
+    def __init__(self, path_list:list, n_frames:int, nfft:int, hop_length:int, n_mels:int, sr:int, norm:bool=False)->th.utils.data.Dataset:
+
         self.path_list = path_list
         self.sr = sr
         self.mel_spec =  torchaudio.transforms.MelSpectrogram(n_fft=nfft, hop_length=hop_length, n_mels=n_mels)

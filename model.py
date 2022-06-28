@@ -5,7 +5,6 @@ import pytorch_lightning as pl
 
 from modules import *
 from data import *
-from utils import *
 
 
 class VAD(pl.LightningModule):
@@ -27,6 +26,7 @@ class VAD(pl.LightningModule):
         return probs
 
     def configure_optimizers(self):
+        
         optim_type = self.hparams.training["optim"]
         assert  optim_type in ['Adam', 'SDG']
         
@@ -36,6 +36,7 @@ class VAD(pl.LightningModule):
             return th.optim.SGD(self.model.parameters() ,lr=self.hparams.training["lr"], weight_decay=self.hparams.training["weight_decay"])
 
     def training_step(self, batch, batch_idx):
+
         x, t = batch['spectro'], batch['targets'].squeeze(1)
         probs = self.forward(x).squeeze(-1)
         loss = self.loss(probs, t)

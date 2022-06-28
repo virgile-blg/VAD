@@ -1,2 +1,3 @@
 __pycache__/*
-notebooks/__pycache__/*
+data_processing/__pycache__/*
+data_processing/.ipynb_checkpoints/*

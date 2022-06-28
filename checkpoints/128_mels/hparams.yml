@@ -1,0 +1,38 @@
+data:
+  batch_size: 128
+  data_dir: /home/virgile/data/vad_data_augmented
+  hop_length: 512
+  n_frames: 256
+  n_mels: 128
+  n_workers: 4
+  nfft: 1048
+  norm: false
+  pin_memory: false
+  sr: 16000
+  valid_percent: 0.85
+model:
+  cnn_channels: 32
+  dff: 512
+  embed_dim: 256
+  n_feat: 128
+  num_heads: 16
+model_checkpoint:
+  filename: VAD-{epoch:02d}
+  monitor: val_loss
+  save_last: true
+trainer:
+  accumulate_grad_batches: 1
+  auto_lr_find: false
+  fast_dev_run: false
+  gpus: '1'
+  max_epochs: 100
+  precision: 32
+  profiler: false
+  val_check_interval: 1.0
+training:
+  lr: 0.0003
+  optim: Adam
+  weight_decay: 1.0e-05
+xp_config:
+  dataset: sonos-vad
+  model_type: VAD

@@ -55,10 +55,10 @@ class VADNet(nn.Module):
         x = x.permute(0, 2, 1)
         x = res = self.fc1(x)
         x, _ = self.self_attention(x, x, x)
-        x += res
+        x += res # Residual connection
         x = res = self.layer_norm1(x)
         x = self.mlp(x)
-        x += res
+        x += res # Residual connection
         x = self.layer_norm2(x)
         x = self.fc2(x)
         return x

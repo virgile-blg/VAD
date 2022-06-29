@@ -33,20 +33,21 @@ class VADPredictor(object):
         mel = th.log(melspec(audio)+self.EPS)
         return mel
 
-    def predict(self, audio_path, threshold):
+    def predict(self, audio_path, threshold=None):
         mel = self.get_mel_spec(audio_path)
         with th.no_grad():
             probs = th.sigmoid(self.model(mel.unsqueeze(0)))
             probs = probs[0, :, 0].detach().numpy()
         
-        probs[probs >= threshold] = 1
-        probs[probs < threshold] = 0
+        if threshold is not None:
+            probs[probs >= threshold] = 1
+            probs[probs < threshold] = 0
 
         return probs
 
-    def plot_result(self, audio_path):
+    def plot_result(self, audio_path, threshold=None):
         mel = self.get_mel_spec(audio_path)
-        probs = self.predict(audio_path)
+        probs = self.predict(audio_path, threshold)
 
         plt.plot(probs*40, color=('red'))
         plt.pcolormesh(mel[0].numpy())

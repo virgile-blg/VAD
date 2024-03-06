@@ -1,6 +1,6 @@
 ## Voice Activity Detector
 
-This project implements a Voice Activity Detection algorithme based on the paper:  __Sofer, A., & Chazan, S. E. (2022). CNN self-attention voice activity detector. arXiv preprint arXiv:2203.02944.__
+This project implements a Voice Activity Detection algorithm based on the paper:  __Sofer, A., & Chazan, S. E. (2022). CNN self-attention voice activity detector. arXiv preprint arXiv:2203.02944.__
 
 The `Data Processing` folder contains primarly a Notebook that has been used for the processing of the annoation and the data aumentation.
 `data_utils.py` contains helper functions for annotation processing.

@@ -1,4 +1,4 @@
-## VAD Challenge  - Sonos
+## Voice Activity Detector
 
 This project implements a Voice Activity Detection algorithme based on the paper:  __Sofer, A., & Chazan, S. E. (2022). CNN self-attention voice activity detector. arXiv preprint arXiv:2203.02944.__
 
@@ -19,6 +19,3 @@ You will also find some artifacts created after the training :
 
 - `checkpoints` folder is the saved model checkpoints, containing weights, optimizer state, hyperparams...
 - `tb_logs` contains the Tensorboard logs
-
-
-
